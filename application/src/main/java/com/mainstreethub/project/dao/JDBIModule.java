@@ -34,7 +34,7 @@ public class JDBIModule {
 
   @Singleton
   @Provides
-  public UserDAO provideUserDAO(DBI dbi) {
-    return dbi.onDemand(UserDAO.class);
+  public QueueLogDAO provideUserDAO(DBI dbi) {
+    return dbi.onDemand(QueueLogDAO.class);
   }
 }

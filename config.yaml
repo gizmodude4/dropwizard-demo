@@ -1,5 +1,5 @@
 database:
   driverClass: com.mysql.jdbc.Driver
-  user: dwdemo
-  password: foobar
-  url: jdbc:mysql://localhost:3306/dwdemo
+  user: product
+  password: k33pwh33l
+  url: jdbc:mysql://localhost:3306/mainstreethub

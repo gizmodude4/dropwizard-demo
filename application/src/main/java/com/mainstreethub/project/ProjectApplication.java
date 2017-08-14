@@ -1,6 +1,5 @@
 package com.mainstreethub.project;
 
-import com.google.common.base.Throwables;
 import com.mainstreethub.project.dao.JDBIModule;
 
 import io.dropwizard.Application;
@@ -14,7 +13,6 @@ import io.dropwizard.bundles.version.VersionSupplier;
 import io.dropwizard.bundles.version.suppliers.MavenVersionSupplier;
 
 import org.flywaydb.core.Flyway;
-import org.flywaydb.core.api.FlywayException;
 
 
 public class ProjectApplication extends Application<ProjectConfiguration> {
@@ -35,13 +33,6 @@ public class ProjectApplication extends Application<ProjectConfiguration> {
     final Flyway flyway = new Flyway();
     DataSourceFactory database = configuration.getDatabase();
     flyway.setDataSource(database.getUrl(), database.getUser(), database.getPassword());
-    try {
-      flyway.migrate();
-    } catch (FlywayException e) {
-      flyway.repair();
-      //don't start app after failed migration attempt
-      Throwables.propagate(e);
-    }
 
     ProjectComponent component = DaggerProjectComponent.builder()
         .jDBIModule(new JDBIModule(configuration.getDatabase(), environment))
@@ -49,6 +40,7 @@ public class ProjectApplication extends Application<ProjectConfiguration> {
         .build();
 
     environment.jersey().register(component.getUsersResource());
+    environment.jersey().register(component.getS3BypassResource());
   }
 
   private void initFlyway(Bootstrap<ProjectConfiguration> bootstrap) {
