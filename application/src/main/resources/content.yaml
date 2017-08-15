@@ -1,0 +1,95 @@
+<#assign environment = env.ENVIRONMENT!"local">
+
+<#switch environment>
+  <#case "prod">
+    <#assign
+      allowed_origins="https://*.mainstreethub.com,https://*.cloud.mainstreethub.com"
+      charon_endpoint="https://authentication.mainstreethub.com"
+      charon_secret="372c6621a71e5aa0570bfb4c467d0d8a"
+      clapi_endpoint="http://content-life-cycle-api.prod"
+      clapi_password="516e4c495d579afdf57d71ca7aebd133"
+    >
+    <#break>
+  <#case "test">
+    <#assign
+      allowed_origins="https://*test.mainstreethub.com,https://*test.cloud.mainstreethub.com,http://localhost:*"
+      charon_endpoint="https://authentication-test.mainstreethub.com"
+      charon_secret="b9dc7390ceedf666e18a609403dd42df"
+      clapi_endpoint="http://content-life-cycle-api.test"
+      clapi_password="7aeeef863891829ff278fe21d57ad777"
+    >
+    <#break>
+  <#default>
+    <#assign
+      allowed_origins="https://*test.mainstreethub.com,https://*test.cloud.mainstreethub.com,http://localhost:*"
+      charon_endpoint="https://authentication-test.mainstreethub.com"
+      charon_secret="b9dc7390ceedf666e18a609403dd42df"
+      clapi_endpoint="http://localhost:3326"
+      clapi_password="7aeeef863891829ff278fe21d57ad777"
+    >
+</#switch>
+
+environment: ${env.ENVIRONMENT}
+
+allowedOrigins: ${allowed_origins}
+
+authentication:
+  <#if env.ENVIRONMENT == 'local'>
+  # To make testing easier, enable API keys in local environment
+  basicAuthConfig:
+    apiKeys:
+      local: test
+  <#else>
+  # Disable access by MSH API keys
+  basicAuthConfig: null
+  </#if>
+  # Enable access by internal MSH users
+  charonConfig:
+    apiKey: content-calendar-api
+    endpoint: ${charon_endpoint}
+    apiSecret: ${charon_secret}
+  # Disable access by external MSH users
+  notaryConfig: null
+
+clapi:
+  endpoint: ${clapi_endpoint}
+  apiKey: content-calendar-api
+  apiPassword: ${clapi_password}
+
+<#if env.ENVIRONMENT == 'test' || env.ENVIRONMENT == 'prod'>
+logging:
+  appenders:
+  - type: json
+
+server:
+  requestLog:
+    type: json-logback-access
+</#if>
+
+
+<#if env.ENVIRONMENT == 'prod' && env.DATADOG_API??>
+metrics:
+  frequency: 1 minute
+  reporters:
+    - type: datadog-ecs
+
+      # Docker provides the container ID in HOSTNAME
+      host: content-calendar-api-${env.HOSTNAME}
+      application: content-calendar-api
+      environment: prod
+
+      useRegexFilters: true
+      includes:
+        - com.mainstreethub.*
+        - .*responses
+        - ch.qos.logback.core.Appender.*
+        - io.dropwizard.jetty.*
+        - jvm.memory.heap.max
+        - jvm.memory.heap.used
+        - jvm.memory.non-heap.used
+        - jvm.threads.count
+        - jvm.threads.deadlock.count
+      transport:
+        type: http
+        apiKey: ${env.DATADOG_API}
+</#if>

@@ -10,7 +10,7 @@
     <version>1.3</version>
   </parent>
 
-  <groupId>com.mainstreethub.project</groupId>
+  <groupId>com.mainstreethub.contentcalendar</groupId>
   <artifactId>parent</artifactId>
   <version>0.1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
@@ -24,12 +24,16 @@
     <!-- Dependency versions. -->
     <dagger.version>2.0</dagger.version>
     <dropwizard.version>0.9.2</dropwizard.version>
+    <dropwizard.version>0.9.2</dropwizard.version>
+    <environment.version>0.1.1</environment.version>
     <flyway.bundle.version>0.8.0-2</flyway.bundle.version>
     <guava.version>18.0</guava.version>
+    <lombok.version>1.16.16</lombok.version>
     <jackson.api.version>2.6.3</jackson.api.version>
     <jackson.version>2.6.3</jackson.version>
     <junit.version>4.12</junit.version>
     <mockito.version>1.10.19</mockito.version>
+    <msh.auth-bundle.version>1.0.5-0</msh.auth-bundle.version>
     <mysql.version>5.1.36</mysql.version>
     <dropwizard.version.bundle.version>0.8.1-2</dropwizard.version.bundle.version>
   </properties>
@@ -64,6 +68,16 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
+        <groupId>com.mainstreethub</groupId>
+        <artifactId>msh-auth-bundle</artifactId>
+        <version>${msh.auth-bundle.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.mainstreethub</groupId>
+        <artifactId>environment</artifactId>
+        <version>${environment.version}</version>
+      </dependency>
+      <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-annotations</artifactId>
         <version>${jackson.api.version}</version>
@@ -83,6 +97,12 @@
         <artifactId>dagger-compiler</artifactId>
         <version>${dagger.version}</version>
         <optional>true</optional>
+      </dependency>
+      <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>${lombok.version}</version>
+        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>com.google.guava</groupId>
